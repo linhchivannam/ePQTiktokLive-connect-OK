@@ -29,33 +29,36 @@
         private void InitializeComponent()
         {
             this.pTop = new System.Windows.Forms.Panel();
+            this.btnConnect = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txtTiktoklive = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.lbTitle = new System.Windows.Forms.Label();
             this.pTiktok = new System.Windows.Forms.PictureBox();
             this.pBottom = new System.Windows.Forms.Panel();
             this.pLeft = new System.Windows.Forms.Panel();
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.pView = new System.Windows.Forms.Panel();
+            this.lbView = new System.Windows.Forms.Label();
+            this.lbJoin = new System.Windows.Forms.Label();
             this.pComment = new System.Windows.Forms.Panel();
-            this.pCommentTop = new System.Windows.Forms.Panel();
             this.dgvComment = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.pView = new System.Windows.Forms.Panel();
-            this.lbView = new System.Windows.Forms.Label();
-            this.lbJoin = new System.Windows.Forms.Label();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.label4 = new System.Windows.Forms.Label();
-            this.txtTiktoklive = new System.Windows.Forms.TextBox();
-            this.btnConnect = new System.Windows.Forms.Button();
+            this.pCommentTop = new System.Windows.Forms.Panel();
             this.lbTiktokUser = new System.Windows.Forms.Label();
+            this.txt64 = new System.Windows.Forms.TextBox();
+            this.txtSau = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.pTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pTiktok)).BeginInit();
             this.pLeft.SuspendLayout();
-            this.pComment.SuspendLayout();
-            this.pCommentTop.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvComment)).BeginInit();
             this.pView.SuspendLayout();
+            this.pComment.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvComment)).BeginInit();
+            this.pCommentTop.SuspendLayout();
             this.SuspendLayout();
             // 
             // pTop
@@ -72,6 +75,41 @@
             this.pTop.Name = "pTop";
             this.pTop.Size = new System.Drawing.Size(1283, 51);
             this.pTop.TabIndex = 1;
+            // 
+            // btnConnect
+            // 
+            this.btnConnect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnConnect.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            this.btnConnect.FlatAppearance.BorderSize = 0;
+            this.btnConnect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnConnect.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnConnect.ForeColor = System.Drawing.Color.White;
+            this.btnConnect.Location = new System.Drawing.Point(1187, 12);
+            this.btnConnect.Name = "btnConnect";
+            this.btnConnect.Size = new System.Drawing.Size(84, 27);
+            this.btnConnect.TabIndex = 29;
+            this.btnConnect.Text = "Connect";
+            this.btnConnect.UseVisualStyleBackColor = false;
+            this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
+            // 
+            // label4
+            // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(957, 21);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(74, 13);
+            this.label4.TabIndex = 28;
+            this.label4.Text = "UserId Tiktok:";
+            // 
+            // txtTiktoklive
+            // 
+            this.txtTiktoklive.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtTiktoklive.Location = new System.Drawing.Point(1037, 18);
+            this.txtTiktoklive.Name = "txtTiktoklive";
+            this.txtTiktoklive.Size = new System.Drawing.Size(138, 20);
+            this.txtTiktoklive.TabIndex = 27;
+            this.txtTiktoklive.Text = "maihongnhungk4";
             // 
             // label1
             // 
@@ -121,6 +159,51 @@
             this.pLeft.Size = new System.Drawing.Size(864, 627);
             this.pLeft.TabIndex = 3;
             // 
+            // flowLayoutPanel1
+            // 
+            this.flowLayoutPanel1.AutoScroll = true;
+            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 39);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(864, 588);
+            this.flowLayoutPanel1.TabIndex = 2;
+            this.flowLayoutPanel1.WrapContents = false;
+            // 
+            // pView
+            // 
+            this.pView.Controls.Add(this.button1);
+            this.pView.Controls.Add(this.txtSau);
+            this.pView.Controls.Add(this.txt64);
+            this.pView.Controls.Add(this.lbView);
+            this.pView.Controls.Add(this.lbJoin);
+            this.pView.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pView.Location = new System.Drawing.Point(0, 0);
+            this.pView.Name = "pView";
+            this.pView.Size = new System.Drawing.Size(864, 39);
+            this.pView.TabIndex = 1;
+            // 
+            // lbView
+            // 
+            this.lbView.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbView.AutoSize = true;
+            this.lbView.ForeColor = System.Drawing.Color.Blue;
+            this.lbView.Location = new System.Drawing.Point(784, 8);
+            this.lbView.Name = "lbView";
+            this.lbView.Size = new System.Drawing.Size(54, 13);
+            this.lbView.TabIndex = 25;
+            this.lbView.Text = "View: 000";
+            // 
+            // lbJoin
+            // 
+            this.lbJoin.AutoSize = true;
+            this.lbJoin.ForeColor = System.Drawing.Color.Green;
+            this.lbJoin.Location = new System.Drawing.Point(21, 8);
+            this.lbJoin.Name = "lbJoin";
+            this.lbJoin.Size = new System.Drawing.Size(32, 13);
+            this.lbJoin.TabIndex = 24;
+            this.lbJoin.Text = "Join: ";
+            // 
             // pComment
             // 
             this.pComment.Controls.Add(this.dgvComment);
@@ -130,15 +213,6 @@
             this.pComment.Name = "pComment";
             this.pComment.Size = new System.Drawing.Size(419, 627);
             this.pComment.TabIndex = 4;
-            // 
-            // pCommentTop
-            // 
-            this.pCommentTop.Controls.Add(this.lbTiktokUser);
-            this.pCommentTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pCommentTop.Location = new System.Drawing.Point(0, 0);
-            this.pCommentTop.Name = "pCommentTop";
-            this.pCommentTop.Size = new System.Drawing.Size(419, 39);
-            this.pCommentTop.TabIndex = 0;
             // 
             // dgvComment
             // 
@@ -185,82 +259,14 @@
             this.Column4.Name = "Column4";
             this.Column4.Visible = false;
             // 
-            // pView
+            // pCommentTop
             // 
-            this.pView.Controls.Add(this.lbView);
-            this.pView.Controls.Add(this.lbJoin);
-            this.pView.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pView.Location = new System.Drawing.Point(0, 0);
-            this.pView.Name = "pView";
-            this.pView.Size = new System.Drawing.Size(864, 39);
-            this.pView.TabIndex = 1;
-            // 
-            // lbView
-            // 
-            this.lbView.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbView.AutoSize = true;
-            this.lbView.ForeColor = System.Drawing.Color.Blue;
-            this.lbView.Location = new System.Drawing.Point(784, 8);
-            this.lbView.Name = "lbView";
-            this.lbView.Size = new System.Drawing.Size(54, 13);
-            this.lbView.TabIndex = 25;
-            this.lbView.Text = "View: 000";
-            // 
-            // lbJoin
-            // 
-            this.lbJoin.AutoSize = true;
-            this.lbJoin.ForeColor = System.Drawing.Color.Green;
-            this.lbJoin.Location = new System.Drawing.Point(21, 8);
-            this.lbJoin.Name = "lbJoin";
-            this.lbJoin.Size = new System.Drawing.Size(32, 13);
-            this.lbJoin.TabIndex = 24;
-            this.lbJoin.Text = "Join: ";
-            // 
-            // flowLayoutPanel1
-            // 
-            this.flowLayoutPanel1.AutoScroll = true;
-            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 39);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(864, 588);
-            this.flowLayoutPanel1.TabIndex = 2;
-            this.flowLayoutPanel1.WrapContents = false;
-            // 
-            // label4
-            // 
-            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(957, 21);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(74, 13);
-            this.label4.TabIndex = 28;
-            this.label4.Text = "UserId Tiktok:";
-            // 
-            // txtTiktoklive
-            // 
-            this.txtTiktoklive.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtTiktoklive.Location = new System.Drawing.Point(1037, 18);
-            this.txtTiktoklive.Name = "txtTiktoklive";
-            this.txtTiktoklive.Size = new System.Drawing.Size(138, 20);
-            this.txtTiktoklive.TabIndex = 27;
-            this.txtTiktoklive.Text = "bacsitranmanh";
-            // 
-            // btnConnect
-            // 
-            this.btnConnect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnConnect.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            this.btnConnect.FlatAppearance.BorderSize = 0;
-            this.btnConnect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnConnect.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnConnect.ForeColor = System.Drawing.Color.White;
-            this.btnConnect.Location = new System.Drawing.Point(1187, 12);
-            this.btnConnect.Name = "btnConnect";
-            this.btnConnect.Size = new System.Drawing.Size(84, 27);
-            this.btnConnect.TabIndex = 29;
-            this.btnConnect.Text = "Connect";
-            this.btnConnect.UseVisualStyleBackColor = false;
-            this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
+            this.pCommentTop.Controls.Add(this.lbTiktokUser);
+            this.pCommentTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pCommentTop.Location = new System.Drawing.Point(0, 0);
+            this.pCommentTop.Name = "pCommentTop";
+            this.pCommentTop.Size = new System.Drawing.Size(419, 39);
+            this.pCommentTop.TabIndex = 0;
             // 
             // lbTiktokUser
             // 
@@ -271,6 +277,30 @@
             this.lbTiktokUser.Size = new System.Drawing.Size(84, 13);
             this.lbTiktokUser.TabIndex = 29;
             this.lbTiktokUser.Text = "UserId Tiktok";
+            // 
+            // txt64
+            // 
+            this.txt64.Location = new System.Drawing.Point(215, 8);
+            this.txt64.Name = "txt64";
+            this.txt64.Size = new System.Drawing.Size(207, 20);
+            this.txt64.TabIndex = 0;
+            // 
+            // txtSau
+            // 
+            this.txtSau.Location = new System.Drawing.Point(495, 8);
+            this.txtSau.Name = "txtSau";
+            this.txtSau.Size = new System.Drawing.Size(207, 20);
+            this.txtSau.TabIndex = 26;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(429, 6);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(60, 23);
+            this.button1.TabIndex = 27;
+            this.button1.Text = "giả mã";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // frm_TTLiveConnect
             // 
@@ -288,12 +318,12 @@
             this.pTop.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pTiktok)).EndInit();
             this.pLeft.ResumeLayout(false);
-            this.pComment.ResumeLayout(false);
-            this.pCommentTop.ResumeLayout(false);
-            this.pCommentTop.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvComment)).EndInit();
             this.pView.ResumeLayout(false);
             this.pView.PerformLayout();
+            this.pComment.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvComment)).EndInit();
+            this.pCommentTop.ResumeLayout(false);
+            this.pCommentTop.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -321,5 +351,8 @@
         private System.Windows.Forms.TextBox txtTiktoklive;
         private System.Windows.Forms.Button btnConnect;
         private System.Windows.Forms.Label lbTiktokUser;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox txtSau;
+        private System.Windows.Forms.TextBox txt64;
     }
 }

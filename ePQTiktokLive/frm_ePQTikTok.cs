@@ -31,6 +31,7 @@ namespace ePQTiktokLive
         bool ghilog = false;
         bool ghidata = false;
         Page page = null; // Biến lưu trữ trang hiện tại của Puppeteer
+        string filePath = "ePQsendFrames.txt";
 
         private Dictionary<string, string> _lastRequestHeaders = new Dictionary<string, string>();
 
@@ -110,7 +111,7 @@ namespace ePQTiktokLive
                 }
                 catch { }
             };
-
+            
             // Bắt WebSocket URL
             page.Client.MessageReceived += (sender, e) =>
             {
@@ -163,6 +164,31 @@ namespace ePQTiktokLive
                                 }
                             }                   
                         }
+                    }
+                }
+                if (e.MessageID == "Network.webSocketFrameSent")
+                {
+                    if (e.MessageData.TryGetProperty("response", out var response) &&
+                        response.TryGetProperty("payloadData", out var payloadData))
+                    {
+                        string payload = payloadData.GetString();
+
+                        byte[] frameBytes = Convert.FromBase64String(payload);
+                        var frame = WebcastPushFrame.Parser.ParseFrom(frameBytes);
+
+                        System.IO.File.AppendAllText(filePath, frame + Environment.NewLine);
+                        Console.WriteLine($"Saved frame: {frame}");
+
+
+                        //if (!string.IsNullOrEmpty(payload))
+                        //{
+                        //    // Lọc payload nếu cần, ví dụ chỉ lưu ping / enter / sub
+                        //    if (payload.Contains("ping") || payload.Contains("enter") || payload.Contains("sub"))
+                        //    {
+                        //        System.IO.File.AppendAllText(filePath, payload + Environment.NewLine);
+                        //        Console.WriteLine($"Saved frame: {payload.Substring(0, Math.Min(80, payload.Length))}...");
+                        //    }
+                        //}
                     }
                 }
             };
