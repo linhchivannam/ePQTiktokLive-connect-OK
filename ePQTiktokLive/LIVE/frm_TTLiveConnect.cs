@@ -17,6 +17,7 @@ using System.IO.Compression;
 using ICSharpCode.SharpZipLib.GZip;
 using ePQTiktokLive.MODEL;
 using ePQTiktokLive.USERCONTROL;
+using System.Text.Json;
 
 namespace ePQTiktokLive.LIVE
 {
@@ -41,9 +42,7 @@ namespace ePQTiktokLive.LIVE
         ("WebcastMemberMessage", bytes => WebcastMemberMessage.Parser.ParseFrom(bytes)),
         ("WebcastControlMessage", bytes => WebcastControlMessage.Parser.ParseFrom(bytes)),
         ("WebcastRoomUserSeqMessage", bytes => WebcastRoomUserSeqMessage.Parser.ParseFrom(bytes)),
-        //("SyntheticWebcastMessage", bytes => SyntheticWebcastMessage.Parser.ParseFrom(bytes)),
-        //// Nếu có WebcastEnvelope bạn có thể thêm:
-        //// ("WebcastEnvelope", bytes => WebcastEnvelope.Parser.ParseFrom(bytes)),
+        
     };
 
         private void pTiktok_Click(object sender, EventArgs e)
@@ -94,80 +93,166 @@ namespace ePQTiktokLive.LIVE
             }
             
         }
+        private void TikTokWebsocket(TikTokRoomInfo myroom)
+        {
+            string roomId = myroom.room_id;
+            string wsUrl = TikTokWebSocketUrlBuilder.BuildUrl(roomId);
+            string cookieHeader = TikTokWebSocketUrlBuilder.GetCookieHeader();
 
+            // 1. In ra URL và Header để kiểm tra
+            Console.WriteLine($"Đang kết nối tới: {wsUrl}");
+            Console.WriteLine($"Sử dụng Cookie Header: {cookieHeader}");
+
+            var ws = new WebSocket(wsUrl);
+            var bytes = new byte[16];
+            using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(bytes);
+            }
+
+            // Encode base64
+            string secWebSocketKey = Convert.ToBase64String(bytes);
+
+            // 2. Bổ sung đầy đủ các HTTP Header
+            ws.CustomHeaders = new Dictionary<string, string>
+            {
+                ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+                ["Origin"] = "https://www.tiktok.com",
+                ["Cookie"] = cookieHeader,
+                ["Pragma"] = "no-cache",
+                ["Cache-Control"] = "no-cache",
+                ["Accept-Encoding"] = "gzip, deflate, br, zstd",
+                ["Accept-Language"] = "en-US,en;q=0.9",
+                ["Sec-WebSocket-Key"]= secWebSocketKey
+        };
+
+            ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
+
+            // 3. Theo dõi trạng thái kết nối
+            ws.OnOpen += (s, e) =>
+            {
+                Console.WriteLine("✅ Kết nối WebSocket đã MỞ. Bắt đầu gửi frame khởi tạo.");
+                SendEnterFrame(roomId, ws);
+                SendSubscribeFrame(roomId, ws);
+                Task.Run(async () => await HeartbeatLoop(ws, roomId));
+            };
+
+            ws.OnMessage += (s, e) =>
+            {
+                Console.WriteLine("🎉 Đã nhận được dữ liệu (ws.OnMessage)");
+                // Logic xử lý dữ liệu của bạn sẽ ở đây
+            };
+
+            ws.OnError += (s, e) =>
+            {
+                Console.WriteLine($"❌ Lỗi WebSocket: {e.Message}");
+            };
+
+            ws.OnClose += (s, e) =>
+            {
+                Console.WriteLine($"🔌 Kết nối WebSocket đã ĐÓNG. Nguyên nhân: {e.Reason}");
+            };
+
+            ws.Connect();
+        }
         private void SendEnterFrame(string roomId, WebSocket ws)
         {
-            var enterMsg = new WebcastWebsocketMessage
+            try
             {
-                Type = "enter",
-                Payload = ByteString.CopyFromUtf8($"{{\"room_id\":\"{roomId}\",\"identity\":\"audience\"}}")
+                // Tạo payload cho client_enter - có thể cần thêm thông tin room
+                var enterPayload = new Dictionary<string, object>
+            {
+                { "room_id", roomId },
+                { "identity", "audience" }
             };
 
-            var enterFrame = new WebcastPushFrame
-            {
-                PayloadType = "sysmsg",
-                Payload = ByteString.CopyFrom(enterMsg.ToByteArray()),
-                LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-            };
+                string jsonPayload = JsonSerializer.Serialize(enterPayload);
+                byte[] payloadBytes = Encoding.UTF8.GetBytes(jsonPayload);
 
-            ws.Send(enterFrame.ToByteArray().GzipCompress());
+                var enterMessage = new WebcastWebsocketMessage
+                {
+                    Type = "client_enter",
+                    Payload = ByteString.CopyFrom(payloadBytes)
+                };
+
+                var pushFrame = new WebcastPushFrame
+                {
+                    PayloadType = "enter",
+                    Payload = ByteString.CopyFrom(enterMessage.ToByteArray()),
+                    LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                };
+
+                byte[] frameBytes = pushFrame.ToByteArray().GzipCompress();
+                ws.Send(frameBytes);
+
+                Console.WriteLine("➡️ Đã gửi thông điệp EnterFrame");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Lỗi khi gửi EnterFrame: {ex.Message}");
+            }
         }
 
         private void SendSubscribeFrame(string roomId, WebSocket ws)
         {
-            var subMsg = new WebcastWebsocketMessage
+            try
             {
-                Type = "sub",
-                Payload = ByteString.CopyFromUtf8($"{{\"room_id\":\"{roomId}\"}}")
-            };
+                // Tạo payload cho subscribe - có thể cần thêm thông tin room
+                var subscribePayload = new Dictionary<string, object>
+        {
+            { "room_id", roomId },
+            { "message_type", "msg,gift,like,member,room_user_seq,control" }
+        };
 
-            var subFrame = new WebcastPushFrame
+                string jsonPayload = JsonSerializer.Serialize(subscribePayload);
+                byte[] payloadBytes = Encoding.UTF8.GetBytes(jsonPayload);
+
+                var subscribeMessage = new WebcastWebsocketMessage
+                {
+                    Type = "subscribe",
+                    Payload = ByteString.CopyFrom(payloadBytes)
+                };
+
+                var pushFrame = new WebcastPushFrame
+                {
+                    PayloadType = "subscribe",
+                    Payload = ByteString.CopyFrom(subscribeMessage.ToByteArray()),
+                    LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                };
+
+                byte[] frameBytes = pushFrame.ToByteArray().GzipCompress();
+                ws.Send(frameBytes);
+
+                Console.WriteLine("🔔 Đã gửi thông điệp SubscribeFrame");
+            }
+            catch (Exception ex)
             {
-                PayloadType = "sysmsg",
-                Payload = ByteString.CopyFrom(subMsg.ToByteArray()),
-                LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-            };
-
-            ws.Send(subFrame.ToByteArray().GzipCompress());
+                Console.WriteLine($"❌ Lỗi khi gửi SubscribeFrame: {ex.Message}");
+            }
         }
 
         private async Task HeartbeatLoop(WebSocket ws, string roomId)
         {
+            ulong seqId = ulong.Parse(roomId);
             while (ws.IsAlive)
             {
-                try
+                var hbMsg = new HeartbeatMessage { RoomId = seqId };
+                var pushFrame = new WebcastPushFrame
                 {
-                    // payload WebcastWebsocketMessage với seqId = roomId
-                    var wsMsg = new WebcastWebsocketMessage
-                    {
-                        Type = "ping",
-                        Payload = ByteString.CopyFromUtf8("{\"seqId\":\"" + roomId + "\"}")
-                    };
+                    PayloadType = "hb",
+                    Payload = ByteString.CopyFrom(hbMsg.ToByteArray()),
+                    LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+                };
 
-                    // Push frame kiểu hb
-                    var pushFrame = new WebcastPushFrame
-                    {
-                        PayloadType = "hb",  // Heartbeat
-                        Payload = ByteString.CopyFrom(wsMsg.ToByteArray()),
-                        LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-                    };
+                string payloadBase64 = Convert.ToBase64String(pushFrame.ToByteArray().GzipCompress());
+                ws.Send(payloadBase64);
 
-                    byte[] frameBytes = pushFrame.ToByteArray();
-                    ws.Send(frameBytes);
+                Console.WriteLine($"💓 Sent Heartbeat seqId={seqId}");
 
-                    Console.WriteLine($"💓 Sent Heartbeat seqId={roomId}");
-
-                    // Delay theo heartbeat_duration TikTok (10-15s)
-                    await Task.Delay(15000);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"❌ Heartbeat error: {ex.Message}");
-                    break;
-                }
+                await Task.Delay(15000); // 15s như web client
             }
         }
-        private void TikTokWebsocket(TikTokRoomInfo myroom)
+        private void TikTokWebsocket3(TikTokRoomInfo myroom)
         {
             string roomId = myroom.room_id;
             string wsUrl = TikTokWebSocketUrlBuilder.BuildUrl(roomId);
@@ -189,6 +274,8 @@ namespace ePQTiktokLive.LIVE
                 ["Accept-Language"] = "en-US,en;q=0.9"
             };
 
+
+
             ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
 
             ws.OnOpen += (s, e) =>
@@ -196,10 +283,10 @@ namespace ePQTiktokLive.LIVE
                 Console.WriteLine("✅ Connected to TikTok WebSocket!");
 
                 // 1️⃣ Join audience / client_enter
-              //  SendEnterFrame(roomId, ws);
+                SendEnterFrame(roomId, ws);
 
                 // 2️⃣ Subscribe comment/gift
-              //  SendSubscribeFrame(roomId, ws);
+               SendSubscribeFrame(roomId, ws);
 
                 // 3️⃣ Start heartbeat
                 Task.Run(async () => await HeartbeatLoop(ws,roomId));
@@ -207,10 +294,11 @@ namespace ePQTiktokLive.LIVE
 
             ws.OnMessage += (s, e) =>
             {
+                Console.WriteLine("Nhan data");
 
                 try
                 {
-                    Console.WriteLine("Nhan data");
+                    
                     byte[] data = e.RawData.GzipDecompress();
                     var frame = WebcastPushFrame.Parser.ParseFrom(data);
 

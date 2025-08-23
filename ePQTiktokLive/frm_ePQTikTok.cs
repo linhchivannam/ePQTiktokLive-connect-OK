@@ -171,24 +171,24 @@ namespace ePQTiktokLive
                     if (e.MessageData.TryGetProperty("response", out var response) &&
                         response.TryGetProperty("payloadData", out var payloadData))
                     {
-                        string payload = payloadData.GetString();
+                        try
+                        {
+                            string payload = payloadData.GetString();
 
-                        byte[] frameBytes = Convert.FromBase64String(payload);
-                        var frame = WebcastPushFrame.Parser.ParseFrom(frameBytes);
+                            byte[] frameBytes = Convert.FromBase64String(payload);
+                            var frame = WebcastPushFrame.Parser.ParseFrom(frameBytes);
 
-                        System.IO.File.AppendAllText(filePath, frame + Environment.NewLine);
-                        Console.WriteLine($"Saved frame: {frame}");
-
-
-                        //if (!string.IsNullOrEmpty(payload))
-                        //{
-                        //    // Lọc payload nếu cần, ví dụ chỉ lưu ping / enter / sub
-                        //    if (payload.Contains("ping") || payload.Contains("enter") || payload.Contains("sub"))
-                        //    {
-                        //        System.IO.File.AppendAllText(filePath, payload + Environment.NewLine);
-                        //        Console.WriteLine($"Saved frame: {payload.Substring(0, Math.Min(80, payload.Length))}...");
-                        //    }
-                        //}
+                            //if (frame.PayloadType == "hb" || frame.PayloadType == "en" || frame.PayloadType == "sub")
+                            //{
+                                System.IO.File.AppendAllText(filePath, frame + Environment.NewLine);
+                                Console.WriteLine($"Saved frame: {frame}");
+                            //}
+                        }
+                        catch (Exception tt)
+                        {
+                            Console.WriteLine($"error: {tt.ToString()}...");
+                        }
+                        
                     }
                 }
             };
@@ -445,6 +445,12 @@ namespace ePQTiktokLive
             //Form1 a = new Form1();
             //a.Show();
             Ghi_header_cookies();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            LIVE.Form1 f = new LIVE.Form1();
+            f.ShowDialog();
         }
     }
 }

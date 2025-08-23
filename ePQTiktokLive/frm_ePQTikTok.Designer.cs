@@ -64,6 +64,7 @@
             this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.pQCommentBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.button2 = new System.Windows.Forms.Button();
             this.pTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.pMain.SuspendLayout();
@@ -209,6 +210,7 @@
             // pConfig
             // 
             this.pConfig.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.pConfig.Controls.Add(this.button2);
             this.pConfig.Controls.Add(this.button1);
             this.pConfig.Controls.Add(this.txtFileLog);
             this.pConfig.Controls.Add(this.label4);
@@ -348,7 +350,7 @@
             this.txtTiktoklive.Name = "txtTiktoklive";
             this.txtTiktoklive.Size = new System.Drawing.Size(408, 20);
             this.txtTiktoklive.TabIndex = 13;
-            this.txtTiktoklive.Text = "https://www.tiktok.com/@huyhoangshow/live";
+            this.txtTiktoklive.Text = "https://www.tiktok.com/@pelun2006199x/live";
             // 
             // pRight
             // 
@@ -424,6 +426,16 @@
             // 
             this.pQCommentBindingSource.DataSource = typeof(ePQTiktokLive.MODEL.PQComment);
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(12, 87);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(52, 23);
+            this.button2.TabIndex = 29;
+            this.button2.Text = "mở";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // frm_ePQTikTok
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -492,5 +504,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
         private System.Windows.Forms.FlowLayoutPanel pComment;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }

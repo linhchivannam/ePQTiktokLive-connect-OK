@@ -17,8 +17,8 @@ namespace ePQTiktokLive
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new frm_ePQTikTok());
-            Application.Run(new LIVE.frm_TTLiveConnect());
+            Application.Run(new frm_ePQTikTok());
+            //Application.Run(new LIVE.frm_TTLiveConnect());
         }
     }
 }

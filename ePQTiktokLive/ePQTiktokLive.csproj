@@ -272,6 +272,12 @@
     <Compile Include="frm_TiktokLive.Designer.cs">
       <DependentUpon>frm_TiktokLive.cs</DependentUpon>
     </Compile>
+    <Compile Include="LIVE\Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LIVE\Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
     <Compile Include="LIVE\frm_TTLiveConnect.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -323,6 +329,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frm_TiktokLive.resx">
       <DependentUpon>frm_TiktokLive.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LIVE\Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LIVE\frm_TTLiveConnect.resx">
       <DependentUpon>frm_TTLiveConnect.cs</DependentUpon>

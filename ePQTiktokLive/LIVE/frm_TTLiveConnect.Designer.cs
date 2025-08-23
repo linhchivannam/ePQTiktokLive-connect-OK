@@ -39,6 +39,9 @@
             this.pLeft = new System.Windows.Forms.Panel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.pView = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
+            this.txtSau = new System.Windows.Forms.TextBox();
+            this.txt64 = new System.Windows.Forms.TextBox();
             this.lbView = new System.Windows.Forms.Label();
             this.lbJoin = new System.Windows.Forms.Label();
             this.pComment = new System.Windows.Forms.Panel();
@@ -49,9 +52,6 @@
             this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.pCommentTop = new System.Windows.Forms.Panel();
             this.lbTiktokUser = new System.Windows.Forms.Label();
-            this.txt64 = new System.Windows.Forms.TextBox();
-            this.txtSau = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
             this.pTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pTiktok)).BeginInit();
             this.pLeft.SuspendLayout();
@@ -109,7 +109,7 @@
             this.txtTiktoklive.Name = "txtTiktoklive";
             this.txtTiktoklive.Size = new System.Drawing.Size(138, 20);
             this.txtTiktoklive.TabIndex = 27;
-            this.txtTiktoklive.Text = "maihongnhungk4";
+            this.txtTiktoklive.Text = "pelun2006199x";
             // 
             // label1
             // 
@@ -182,6 +182,30 @@
             this.pView.Name = "pView";
             this.pView.Size = new System.Drawing.Size(864, 39);
             this.pView.TabIndex = 1;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(429, 6);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(60, 23);
+            this.button1.TabIndex = 27;
+            this.button1.Text = "giả mã";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // txtSau
+            // 
+            this.txtSau.Location = new System.Drawing.Point(495, 8);
+            this.txtSau.Name = "txtSau";
+            this.txtSau.Size = new System.Drawing.Size(207, 20);
+            this.txtSau.TabIndex = 26;
+            // 
+            // txt64
+            // 
+            this.txt64.Location = new System.Drawing.Point(215, 8);
+            this.txt64.Name = "txt64";
+            this.txt64.Size = new System.Drawing.Size(207, 20);
+            this.txt64.TabIndex = 0;
             // 
             // lbView
             // 
@@ -277,30 +301,6 @@
             this.lbTiktokUser.Size = new System.Drawing.Size(84, 13);
             this.lbTiktokUser.TabIndex = 29;
             this.lbTiktokUser.Text = "UserId Tiktok";
-            // 
-            // txt64
-            // 
-            this.txt64.Location = new System.Drawing.Point(215, 8);
-            this.txt64.Name = "txt64";
-            this.txt64.Size = new System.Drawing.Size(207, 20);
-            this.txt64.TabIndex = 0;
-            // 
-            // txtSau
-            // 
-            this.txtSau.Location = new System.Drawing.Point(495, 8);
-            this.txtSau.Name = "txtSau";
-            this.txtSau.Size = new System.Drawing.Size(207, 20);
-            this.txtSau.TabIndex = 26;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(429, 6);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(60, 23);
-            this.button1.TabIndex = 27;
-            this.button1.Text = "giả mã";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // frm_TTLiveConnect
             // 

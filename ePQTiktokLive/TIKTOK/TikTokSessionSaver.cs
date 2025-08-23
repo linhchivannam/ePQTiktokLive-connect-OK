@@ -85,12 +85,17 @@ namespace ePQTiktokLive.TIKTOK
             
             var roomInfo = JsonSerializer.Deserialize<TikTokRoomInfo>(jsonRoom);
 
-            
+           
+
+
+
 
             File.WriteAllText("roominfo.json", JsonSerializer.Serialize(roomInfo, new JsonSerializerOptions { WriteIndented = true }));
             Console.WriteLine("💾 roominfo.json saved.");
 
+            await SaveSessionAsync2(page);
 
+            return roomInfo;
 
             // save cookies
             var cookiesAll = await page.GetCookiesAsync();
@@ -139,6 +144,44 @@ namespace ePQTiktokLive.TIKTOK
             Console.WriteLine("👉 Đã đóng browser. Bạn có thể dùng WebSocket ngay.");
             return roomInfo;
             
+        }
+
+        public async static Task SaveSessionAsync2(IPage page)
+        {
+            var cookies = await page.GetCookiesAsync();
+            var localStorage = await page.EvaluateExpressionAsync<Dictionary<string, string>>("localStorage");
+            var url = page.Url;
+
+            string roomId = string.Empty;
+            var liveMatch = System.Text.RegularExpressions.Regex.Match(url, @"/live/(?<roomId>\d+)");
+            if (liveMatch.Success)
+            {
+                roomId = liveMatch.Groups["roomId"].Value;
+            }
+
+            var msToken = cookies.FirstOrDefault(c => c.Name == "msToken")?.Value;
+            var ttwid = cookies.FirstOrDefault(c => c.Name == "ttwid")?.Value;
+            var s_v_web_id = cookies.FirstOrDefault(c => c.Name == "s_v_web_id")?.Value;
+            string verifyFp = null;
+            if (localStorage.TryGetValue("verifyFp", out var value))
+            {
+                verifyFp = value;
+            }
+
+            var wsInfo = new
+            {
+                room_id = roomId,
+                msToken = msToken,
+                ttwid = ttwid,
+                verifyFp = verifyFp,
+                s_v_web_id = s_v_web_id
+            };
+
+            File.WriteAllText("cookies.json", JsonSerializer.Serialize(cookies, new JsonSerializerOptions { WriteIndented = true }));
+            File.WriteAllText("localstorage.json", JsonSerializer.Serialize(localStorage, new JsonSerializerOptions { WriteIndented = true }));
+            File.WriteAllText("wsinfo.json", JsonSerializer.Serialize(wsInfo, new JsonSerializerOptions { WriteIndented = true }));
+
+            Console.WriteLine("✅ Đã lưu các tệp session thành công!");
         }
         public static TikTokRoomInfo ReadRoomInfo(string filePath = "roominfo.json")
         {

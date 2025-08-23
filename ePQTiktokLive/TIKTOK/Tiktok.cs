@@ -88,10 +88,38 @@ namespace ePQTiktokLive.TIKTOK
             var fpCookie = cookies.FirstOrDefault(c =>
                 c.ContainsKey("Name") && c["Name"].ToString() == "s_v_web_id");
 
+            var ttwid = cookies.FirstOrDefault(c =>
+                c.ContainsKey("Name") && c["Name"].ToString() == "ttwid");
+
             if (fpCookie != null && fpCookie.ContainsKey("Value"))
             {
                 string verifyFp = fpCookie["Value"].ToString();
                 Console.WriteLine("✅ verifyFp = " + verifyFp);
+                return verifyFp;
+            }
+
+            Console.WriteLine("⚠️ Không tìm thấy cookie s_v_web_id (verifyFp).");
+            return "";
+        }
+        public static string TimCookies(string name)
+        {
+            if (!File.Exists(CookieFile))
+                throw new FileNotFoundException("❌ Không tìm thấy cookies.json, hãy login trước.");
+
+            string json = File.ReadAllText(CookieFile);
+            var cookies = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(json);
+
+            if (cookies == null) return null;
+
+            var fpCookie = cookies.FirstOrDefault(c =>
+                c.ContainsKey("Name") && c["Name"].ToString() == name);
+
+          
+
+            if (fpCookie != null && fpCookie.ContainsKey("Value"))
+            {
+                string verifyFp = fpCookie["Value"].ToString();
+              //  Console.WriteLine("✅ verifyFp = " + verifyFp);
                 return verifyFp;
             }
 
@@ -104,7 +132,7 @@ namespace ePQTiktokLive.TIKTOK
             var localStore = GetLocalStorage();
             var sessionStore = GetSessionStorage();
             
-
+           
 
             string msToken = localStore.ContainsKey("msToken") ? localStore["msToken"].ToString() : "";
             string s_v_web_id = GetVerifyFp();
@@ -147,6 +175,9 @@ namespace ePQTiktokLive.TIKTOK
             // Bổ sung msToken, verifyFp, s_v_web_id nếu có
             if (!string.IsNullOrEmpty(msToken))
                 query["msToken"] = msToken;
+
+            query["ttwid"] = TimCookies("ttwid");
+
             if (!string.IsNullOrEmpty(verifyFp))
                 query["verifyFp"] = verifyFp;
             //if (!string.IsNullOrEmpty(s_v_web_id))
@@ -154,6 +185,7 @@ namespace ePQTiktokLive.TIKTOK
 
             // Ghép URL
             string url = "wss://webcast-ws.tiktok.com/webcast/im/ws_proxy/ws_reuse_supplement/?" + query.ToString();
+            Console.WriteLine("wUrl = " + url);
             return url;
         }
     }
