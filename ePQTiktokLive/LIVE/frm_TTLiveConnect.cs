@@ -18,6 +18,7 @@ using ICSharpCode.SharpZipLib.GZip;
 using ePQTiktokLive.MODEL;
 using ePQTiktokLive.USERCONTROL;
 using System.Text.Json;
+using ePQTiktokLive.protobuf;
 
 namespace ePQTiktokLive.LIVE
 {
@@ -177,7 +178,7 @@ namespace ePQTiktokLive.LIVE
 
                 var pushFrame = new WebcastPushFrame
                 {
-                    PayloadType = "enter",
+                    PayloadType = "en",
                     Payload = ByteString.CopyFrom(enterMessage.ToByteArray()),
                     LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 };
@@ -215,7 +216,7 @@ namespace ePQTiktokLive.LIVE
 
                 var pushFrame = new WebcastPushFrame
                 {
-                    PayloadType = "subscribe",
+                    PayloadType = "sub",
                     Payload = ByteString.CopyFrom(subscribeMessage.ToByteArray()),
                     LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 };
@@ -252,7 +253,11 @@ namespace ePQTiktokLive.LIVE
                 await Task.Delay(15000); // 15s như web client
             }
         }
-        private void TikTokWebsocket3(TikTokRoomInfo myroom)
+        // Hàm tạo frame chung (payloadType = "en", "sub", ...)
+        
+    
+
+    private void TikTokWebsocket3(TikTokRoomInfo myroom)
         {
             string roomId = myroom.room_id;
             string wsUrl = TikTokWebSocketUrlBuilder.BuildUrl(roomId);

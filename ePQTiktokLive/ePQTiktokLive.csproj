@@ -294,6 +294,7 @@
     <Compile Include="protobuf\Webcast.cs" />
     <Compile Include="protobuf\WebcastResponse.cs" />
     <Compile Include="protobuf\WebcastWebsocketMessage.cs" />
+    <Compile Include="protobuf\WebcastWebsocketRequest.cs" />
     <Compile Include="TIKTOK\Constants.cs" />
     <Compile Include="TIKTOK\Tiktok.cs" />
     <Compile Include="TIKTOK\TikTokLivestreamClient.cs" />
