@@ -109,7 +109,7 @@
             this.txtTiktoklive.Name = "txtTiktoklive";
             this.txtTiktoklive.Size = new System.Drawing.Size(138, 20);
             this.txtTiktoklive.TabIndex = 27;
-            this.txtTiktoklive.Text = "pelun2006199x";
+            this.txtTiktoklive.Text = "ischaindyofc";
             // 
             // label1
             // 

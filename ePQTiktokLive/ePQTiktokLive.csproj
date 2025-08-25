@@ -295,6 +295,7 @@
     <Compile Include="protobuf\WebcastResponse.cs" />
     <Compile Include="protobuf\WebcastWebsocketMessage.cs" />
     <Compile Include="protobuf\WebcastWebsocketRequest.cs" />
+    <Compile Include="protobuf\WsFrames.cs" />
     <Compile Include="TIKTOK\Constants.cs" />
     <Compile Include="TIKTOK\Tiktok.cs" />
     <Compile Include="TIKTOK\TikTokLivestreamClient.cs" />
@@ -376,6 +377,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="git\TextFile1.txt" />
+    <Content Include="PHUQUI\tao file proto.txt" />
     <None Include="Resources\tiktok.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -101,8 +101,8 @@ namespace ePQTiktokLive.LIVE
             string cookieHeader = TikTokWebSocketUrlBuilder.GetCookieHeader();
 
             // 1. In ra URL và Header để kiểm tra
-            Console.WriteLine($"Đang kết nối tới: {wsUrl}");
-            Console.WriteLine($"Sử dụng Cookie Header: {cookieHeader}");
+            //Console.WriteLine($"Đang kết nối tới: {wsUrl}");
+            //Console.WriteLine($"Sử dụng Cookie Header: {cookieHeader}");
 
             var ws = new WebSocket(wsUrl);
             var bytes = new byte[16];
@@ -133,9 +133,27 @@ namespace ePQTiktokLive.LIVE
             ws.OnOpen += (s, e) =>
             {
                 Console.WriteLine("✅ Kết nối WebSocket đã MỞ. Bắt đầu gửi frame khởi tạo.");
-                SendEnterFrame(roomId, ws);
-                SendSubscribeFrame(roomId, ws);
-                Task.Run(async () => await HeartbeatLoop(ws, roomId));
+
+                // 1) Enter
+                ws.Send(WsFrames.BuildEnterFrame(Convert.ToInt64(roomId)));
+
+                // 2) Subscribe (nếu lúc đầu chưa có cursor thì để rỗng)
+                ws.Send(WsFrames.BuildSubscribeFrame(""));
+
+                // 3) Heartbeat mỗi 15s
+                var timer = new System.Timers.Timer(15000);
+                timer.Elapsed += (s1, e1) =>
+                {
+                    ws.Send(WsFrames.BuildHeartbeatFrame(Convert.ToInt64(roomId)));
+                };
+                timer.AutoReset = true;
+                timer.Start();
+
+
+
+                //SendEnterFrame(roomId, ws);
+                //SendSubscribeFrame(roomId, ws);
+                //Task.Run(async () => await HeartbeatLoop(ws, roomId));
             };
 
             ws.OnMessage += (s, e) =>
@@ -156,41 +174,34 @@ namespace ePQTiktokLive.LIVE
 
             ws.Connect();
         }
+
+
         private void SendEnterFrame(string roomId, WebSocket ws)
         {
             try
             {
-                // Tạo payload cho client_enter - có thể cần thêm thông tin room
-                var enterPayload = new Dictionary<string, object>
-            {
-                { "room_id", roomId },
-                { "identity", "audience" }
-            };
-
-                string jsonPayload = JsonSerializer.Serialize(enterPayload);
-                byte[] payloadBytes = Encoding.UTF8.GetBytes(jsonPayload);
-
-                var enterMessage = new WebcastWebsocketMessage
+                // Giống Node.js: client_enter
+                var request = new WebcastWebsocketMessage
                 {
                     Type = "client_enter",
-                    Payload = ByteString.CopyFrom(payloadBytes)
+                    Payload = ByteString.CopyFromUtf8(roomId) // payload chỉ cần roomId
                 };
 
                 var pushFrame = new WebcastPushFrame
                 {
-                    PayloadType = "en",
-                    Payload = ByteString.CopyFrom(enterMessage.ToByteArray()),
+                    PayloadType = "en", // enter
+                    Payload = request.ToByteString(),
                     LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 };
 
                 byte[] frameBytes = pushFrame.ToByteArray().GzipCompress();
                 ws.Send(frameBytes);
 
-                Console.WriteLine("➡️ Đã gửi thông điệp EnterFrame");
+                Console.WriteLine("➡️ Sent EnterFrame");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Lỗi khi gửi EnterFrame: {ex.Message}");
+                Console.WriteLine($"❌ Error SendEnterFrame: {ex.Message}");
             }
         }
 
@@ -198,37 +209,28 @@ namespace ePQTiktokLive.LIVE
         {
             try
             {
-                // Tạo payload cho subscribe - có thể cần thêm thông tin room
-                var subscribePayload = new Dictionary<string, object>
-        {
-            { "room_id", roomId },
-            { "message_type", "msg,gift,like,member,room_user_seq,control" }
-        };
-
-                string jsonPayload = JsonSerializer.Serialize(subscribePayload);
-                byte[] payloadBytes = Encoding.UTF8.GetBytes(jsonPayload);
-
-                var subscribeMessage = new WebcastWebsocketMessage
+                // Giống Node.js: subscribe
+                var request = new WebcastWebsocketMessage
                 {
                     Type = "subscribe",
-                    Payload = ByteString.CopyFrom(payloadBytes)
+                    Payload = ByteString.CopyFromUtf8("msg,gift,like,member,room_user_seq,control")
                 };
 
                 var pushFrame = new WebcastPushFrame
                 {
-                    PayloadType = "sub",
-                    Payload = ByteString.CopyFrom(subscribeMessage.ToByteArray()),
+                    PayloadType = "sub", // subscribe
+                    Payload = request.ToByteString(),
                     LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 };
 
                 byte[] frameBytes = pushFrame.ToByteArray().GzipCompress();
                 ws.Send(frameBytes);
 
-                Console.WriteLine("🔔 Đã gửi thông điệp SubscribeFrame");
+                Console.WriteLine("🔔 Sent SubscribeFrame");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Lỗi khi gửi SubscribeFrame: {ex.Message}");
+                Console.WriteLine($"❌ Error SendSubscribeFrame: {ex.Message}");
             }
         }
 
