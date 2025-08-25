@@ -19,6 +19,10 @@ using ePQTiktokLive.MODEL;
 using ePQTiktokLive.USERCONTROL;
 using System.Text.Json;
 using ePQTiktokLive.protobuf;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+using System.Net.Sockets;
+using System.Net.WebSockets;
+using TikTok.Proto;
 
 namespace ePQTiktokLive.LIVE
 {
@@ -34,6 +38,14 @@ namespace ePQTiktokLive.LIVE
 
         string filelog = "";
         bool ghilog = false;
+
+
+        private readonly string _wsUrl;
+        private readonly string _roomId;
+        private readonly string _cookie;
+        private readonly ClientWebSocket _ws;
+        private CancellationTokenSource _cts;
+        private System.Threading.Timer _heartbeatTimer;
 
         private static readonly List<(string Name, Func<byte[], IMessage> Parse)> parsers = new List<(string Name, Func<byte[], IMessage> Parse)>
     {
@@ -94,249 +106,128 @@ namespace ePQTiktokLive.LIVE
             }
             
         }
-        private void TikTokWebsocket(TikTokRoomInfo myroom)
+        private async void TikTokWebsocket(TikTokRoomInfo myroom)
         {
             string roomId = myroom.room_id;
             string wsUrl = TikTokWebSocketUrlBuilder.BuildUrl(roomId);
             string cookieHeader = TikTokWebSocketUrlBuilder.GetCookieHeader();
+
+            var client = new TikTokWebSocketClient(wsUrl, roomId, cookieHeader);
+
+            client.OnFrameReceived += (frame) =>
+            {
+                Console.WriteLine($"Got frame: {frame.PayloadType}");
+
+                //if (frame.PayloadType == "ack")
+                //{
+                //    var ackMsg = WebcastAckMessage.Parser.ParseFrom(frame.Payload);
+                //    _ = client.SendAsync(client.BuildAckFrame(ackMsg.ServerTimestamp, ackMsg.ReceivedMessages.ToArray()));
+                //}
+                //else if (frame.PayloadType == "msg")
+                //{
+                //    // TODO: parse chat/gift/like
+                //}
+            };
+
+            await client.ConnectAsync();
+
 
             // 1. In ra URL và Header để kiểm tra
             //Console.WriteLine($"Đang kết nối tới: {wsUrl}");
             //Console.WriteLine($"Sử dụng Cookie Header: {cookieHeader}");
 
-            var ws = new WebSocket(wsUrl);
-            var bytes = new byte[16];
-            using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(bytes);
-            }
+            //var ws = new WebSocket(wsUrl);
+            //var bytes = new byte[16];
+            //using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+            //{
+            //    rng.GetBytes(bytes);
+            //}
 
-            // Encode base64
-            string secWebSocketKey = Convert.ToBase64String(bytes);
+            //// Encode base64
+            //string secWebSocketKey = Convert.ToBase64String(bytes);
 
-            // 2. Bổ sung đầy đủ các HTTP Header
-            ws.CustomHeaders = new Dictionary<string, string>
-            {
-                ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-                ["Origin"] = "https://www.tiktok.com",
-                ["Cookie"] = cookieHeader,
-                ["Pragma"] = "no-cache",
-                ["Cache-Control"] = "no-cache",
-                ["Accept-Encoding"] = "gzip, deflate, br, zstd",
-                ["Accept-Language"] = "en-US,en;q=0.9",
-                //["Sec-WebSocket-Key"]= secWebSocketKey
-        };
+            //// 2. Bổ sung đầy đủ các HTTP Header
+            //ws.CustomHeaders = new Dictionary<string, string>
+            //{
+            //    ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+            //    ["Origin"] = "https://www.tiktok.com",
+            //    ["Cookie"] = cookieHeader,
+            //    ["Pragma"] = "no-cache",
+            //    ["Cache-Control"] = "no-cache",
+            //    ["Accept-Encoding"] = "gzip, deflate, br, zstd",
+            //    ["Accept-Language"] = "en-US,en;q=0.9",
+            //    //["Sec-WebSocket-Key"]= secWebSocketKey
+            //};
 
-            ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
+            ////string referer = $"https://www.tiktok.com/@{myroom.unique_id}/live/{roomId}";
+            ////string userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36";
 
-            // 3. Theo dõi trạng thái kết nối
-            ws.OnOpen += (s, e) =>
-            {
-                Console.WriteLine("✅ Connected to TikTok WebSocket!");
+            //ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
 
-                ws.Send(WsFrames.BuildEnterFrame(roomId, "audience", cookie, referer, userAgent));
-                await Task.Delay(60);
-                ws.Send(WsFrames.BuildSubscribeFrame(cursor: "", roomId, cookie, referer, userAgent));
-                await Task.Delay(60);
+            //// 3. Theo dõi trạng thái kết nối
+            //ws.OnOpen += (s, e) =>
+            //{
+            //    Console.WriteLine("✅ Connected to TikTok WebSocket!");
 
-                // Heartbeat lặp – chuẩn là ~10s (theo tham số url)
-                _ = Task.Run(async () =>
-                {
-                    while (ws.ReadyState == WebSocketState.Open)
-                    {
-                        ws.Send(WsFrames.BuildHeartbeatFrame(roomId, cookie, referer, userAgent));
-                        await Task.Delay(10000);
-                    }
-                });
+            //    // sau khi ws.Connect hoặc ws.OnOpen:
+            //    var enterBytes = WsFrames.BuildEnterFrame(roomId);
+            //    ws.Send(enterBytes); // SEND BINARY
 
+            //     Task.Delay(120); // small delay to let server process
 
-                //SendEnterFrame(roomId, ws);
-                //SendSubscribeFrame(roomId, ws);
-                //Task.Run(async () => await HeartbeatLoop(ws, roomId));
-            };
+            //    ws.Send(WsFrames.BuildSubFrame(roomId, 1)); // chat
+            //    ws.Send(WsFrames.BuildSubFrame(roomId, 2)); // gift
+            //    ws.Send(WsFrames.BuildSubFrame(roomId, 3)); // like
+            //    ws.Send(WsFrames.BuildSubFrame(roomId, 4)); // room info / social
 
-            ws.OnMessage += (s, e) =>
-            {
-                Console.WriteLine("🎉 Đã nhận được dữ liệu (ws.OnMessage)");
-                // Logic xử lý dữ liệu của bạn sẽ ở đây
-            };
+               
 
-            ws.OnError += (s, e) =>
-            {
-                Console.WriteLine($"❌ Lỗi WebSocket: {e.Message}");
-            };
+            //    // start heartbeat loop (send every 10s or as url heartbeat_duration)
+            //    _ = Task.Run(async () =>
+            //    {
+            //        while (ws.IsAlive)
+            //        {
+            //            var hb = WsFrames.BuildHeartbeatFrame();
+            //            ws.Send(hb);
+            //            await Task.Delay(20000); // use heartbeat_duration from wsUrl (10s in your case)
+            //        }
+            //    });
+            //   // Console.WriteLine("Nhan (ws.OnMessage)");
+            //    //SendEnterFrame(roomId, ws);
+            //    //SendSubscribeFrame(roomId, ws);
+            //    //Task.Run(async () => await HeartbeatLoop(ws, roomId));
+            //};
+            
+            //ws.OnMessage += (s, e) =>
+            //{
+            //    Console.WriteLine("🎉 Đã nhận được dữ liệu (ws.OnMessage)");
+            //    // parse data -> nếu thấy server yêu cầu ack thì gửi
+            //    //long serverTimestamp = ...;
+            //    //long[] receivedIds = ...;
 
-            ws.OnClose += (s, e) =>
-            {
-                Console.WriteLine($"🔌 Kết nối WebSocket đã ĐÓNG. Nguyên nhân: {e.Reason}");
-            };
+            //    //ws.Send(WsFrames.BuildAckFrame(serverTimestamp, receivedIds));
+            //    // Logic xử lý dữ liệu của bạn sẽ ở đây
+            //};
 
-            ws.Connect();
+            //ws.OnError += (s, e) =>
+            //{
+            //    Console.WriteLine($"❌ Lỗi WebSocket: {e.Message}");
+            //};
+
+            //ws.OnClose += (s, e) =>
+            //{
+            //    Console.WriteLine($"🔌 Kết nối WebSocket đã ĐÓNG. Nguyên nhân: {e.Reason}");
+            //};
+
+            //ws.Connect();
         }
 
 
-        private void SendEnterFrame(string roomId, WebSocket ws)
-        {
-            try
-            {
-                // Giống Node.js: client_enter
-                var request = new WebcastWebsocketMessage
-                {
-                    Type = "client_enter",
-                    Payload = ByteString.CopyFromUtf8(roomId) // payload chỉ cần roomId
-                };
-
-                var pushFrame = new WebcastPushFrame
-                {
-                    PayloadType = "en", // enter
-                    Payload = request.ToByteString(),
-                    LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                };
-
-                byte[] frameBytes = pushFrame.ToByteArray().GzipCompress();
-                ws.Send(frameBytes);
-
-                Console.WriteLine("➡️ Sent EnterFrame");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Error SendEnterFrame: {ex.Message}");
-            }
-        }
-
-        private void SendSubscribeFrame(string roomId, WebSocket ws)
-        {
-            try
-            {
-                // Giống Node.js: subscribe
-                var request = new WebcastWebsocketMessage
-                {
-                    Type = "subscribe",
-                    Payload = ByteString.CopyFromUtf8("msg,gift,like,member,room_user_seq,control")
-                };
-
-                var pushFrame = new WebcastPushFrame
-                {
-                    PayloadType = "sub", // subscribe
-                    Payload = request.ToByteString(),
-                    LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                };
-
-                byte[] frameBytes = pushFrame.ToByteArray().GzipCompress();
-                ws.Send(frameBytes);
-
-                Console.WriteLine("🔔 Sent SubscribeFrame");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Error SendSubscribeFrame: {ex.Message}");
-            }
-        }
-
-        private async Task HeartbeatLoop(WebSocket ws, string roomId)
-        {
-            ulong seqId = ulong.Parse(roomId);
-            while (ws.IsAlive)
-            {
-                var hbMsg = new HeartbeatMessage { RoomId = seqId };
-                var pushFrame = new WebcastPushFrame
-                {
-                    PayloadType = "hb",
-                    Payload = ByteString.CopyFrom(hbMsg.ToByteArray()),
-                    LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-                };
-
-                string payloadBase64 = Convert.ToBase64String(pushFrame.ToByteArray().GzipCompress());
-                ws.Send(payloadBase64);
-
-                Console.WriteLine($"💓 Sent Heartbeat seqId={seqId}");
-
-                await Task.Delay(15000); // 15s như web client
-            }
-        }
-        // Hàm tạo frame chung (payloadType = "en", "sub", ...)
+      
         
     
 
-    private void TikTokWebsocket3(TikTokRoomInfo myroom)
-        {
-            string roomId = myroom.room_id;
-            string wsUrl = TikTokWebSocketUrlBuilder.BuildUrl(roomId);
-            string cookieHeader = TikTokWebSocketUrlBuilder.GetCookieHeader();
-
-            var ws = new WebSocket(wsUrl);
-
-            // Header bắt buộc cho TikTok
-            ws.CustomHeaders = new Dictionary<string, string>
-            {
-                ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
-                                  "AppleWebKit/537.36 (KHTML, like Gecko) " +
-                                  "Chrome/138.0.0.0 Safari/537.36",
-                ["Origin"] = "https://www.tiktok.com",
-                ["Cookie"] = cookieHeader,
-                ["Pragma"] = "no-cache",
-                ["Cache-Control"] = "no-cache",
-                ["Accept-Encoding"] = "gzip, deflate, br, zstd",
-                ["Accept-Language"] = "en-US,en;q=0.9"
-            };
-
-
-
-            ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
-
-            ws.OnOpen += (s, e) =>
-            {
-                Console.WriteLine("✅ Connected to TikTok WebSocket!");
-
-                // 1️⃣ Join audience / client_enter
-                SendEnterFrame(roomId, ws);
-
-                // 2️⃣ Subscribe comment/gift
-               SendSubscribeFrame(roomId, ws);
-
-                // 3️⃣ Start heartbeat
-                Task.Run(async () => await HeartbeatLoop(ws,roomId));
-            };
-
-            ws.OnMessage += (s, e) =>
-            {
-                Console.WriteLine("Nhan data");
-
-                try
-                {
-                    
-                    byte[] data = e.RawData.GzipDecompress();
-                    var frame = WebcastPushFrame.Parser.ParseFrom(data);
-
-                    if (frame.PayloadType == "msg" || frame.PayloadType == "gift")
-                    {
-                        var wsMsg = WebcastWebsocketMessage.Parser.ParseFrom(frame.Payload);
-
-                        // payload nested
-                        string base64Payload = Convert.ToBase64String(wsMsg.Payload.ToByteArray());
-                        TryDecodePayload(base64Payload); // parse WebcastChatMessage / WebcastGiftMessage
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"❌ Decode error: {ex.Message}");
-                }
-            };
-
-            ws.OnError += (s, e) =>
-            {
-                Console.WriteLine($"❌ WebSocket Error: {e.Message}");
-            };
-
-            ws.OnClose += (s, e) =>
-            {
-                Console.WriteLine($"🔌 WebSocket Closed: {e.Reason}");
-                // tự reconnect sau 3s
-                Task.Delay(3000).ContinueWith(_ => TikTokWebsocket(myroom));
-            };
-
-            ws.Connect();
-        }
+   
         void TryDecodePayload(string base64)
         {
             byte[] payloadBytes = Convert.FromBase64String(base64);
@@ -490,103 +381,11 @@ namespace ePQTiktokLive.LIVE
                 writer.WriteLine(frame);
             }
         }
-        private void TikTokWebsocket2(TikTokRoomInfo myroom)
-        {
-            string roomId = myroom.room_id;
-            string wsUrl = TikTokWebSocketUrlBuilder.BuildUrl(roomId);
-            string cookieHeader = TikTokWebSocketUrlBuilder.GetCookieHeader();
-
-            var ws = new WebSocket(wsUrl);
-
-            // Header bắt buộc cho TikTok
-            ws.CustomHeaders = new Dictionary<string, string>
-            {
-                ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
-                                  "AppleWebKit/537.36 (KHTML, like Gecko) " +
-                                  "Chrome/138.0.0.0 Safari/537.36",
-                ["Origin"] = "https://www.tiktok.com",
-                ["Cookie"] = cookieHeader,
-                ["Pragma"] = "no-cache",
-                ["Cache-Control"] = "no-cache",
-                ["Accept-Encoding"] = "gzip, deflate, br, zstd",
-                ["Accept-Language"] = "en-US,en;q=0.9"
-            };
-
-            ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
-
-            // Khi kết nối thành công
-            ws.OnOpen += (s, e) =>
-            {
-                Console.WriteLine("✅ Connected to TikTok WebSocket!");
-
-                // Task gửi heartbeat định kỳ
-                Task.Run(async () =>
-                {
-                    while (ws.IsAlive)
-                    {
-                        try
-                        {
-                            var pingMsg = new WebcastWebsocketMessage { Type = "ping", Payload = ByteString.Empty };
-                            var pushFrame = new WebcastPushFrame
-                            {
-                                PayloadType = "hb",
-                                Payload = ByteString.CopyFrom(pingMsg.ToByteArray()),
-                                LogId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-                            };
-
-                            byte[] frameBytes = pushFrame.ToByteArray().GzipCompress();
-                            ws.Send(frameBytes);
-
-                            await Task.Delay(15000); // heartbeat mỗi 15s
-                        }
-                        catch
-                        {
-                            break;
-                        }
-                    }
-                });
-            };
-
-            // Khi nhận message từ server
-            ws.OnMessage += (s, e) =>
-            {
-                try
-                {
-                    // Giải nén gzip nếu server compress
-                    byte[] data = e.RawData.GzipDecompress();
-
-                    // TODO: decode protobuf WebcastPushFrame
-                    Console.WriteLine($"📩 Message received ({data.Length} bytes)");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"❌ Message decode error: {ex.Message}");
-                }
-            };
-
-            ws.OnError += (s, e) =>
-            {
-                Console.WriteLine($"❌ WebSocket Error: {e.Message}");
-            };
-
-            ws.OnClose += (s, e) =>
-            {
-                Console.WriteLine($"🔌 WebSocket Closed: {e.Reason}");
-                // Tự động reconnect nếu cần
-                Task.Delay(3000).ContinueWith(_ => TikTokWebsocket(myroom));
-            };
-
-            ws.Connect();
-        }
+       
 
         // Extension method nén/gải nén gzip
 
 
-        public static void StopHeartbeat()
-        {
-            _timer?.Dispose();
-            Console.WriteLine("💔 Heartbeat stopped");
-        }
 
         private void button1_Click(object sender, EventArgs e)
         {

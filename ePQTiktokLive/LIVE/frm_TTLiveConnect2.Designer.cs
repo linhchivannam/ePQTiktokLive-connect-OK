@@ -1,6 +1,6 @@
 ﻿namespace ePQTiktokLive.LIVE
 {
-    partial class frm_TTLiveConnect
+    partial class frm_TTLiveConnect2
     {
         /// <summary>
         /// Required designer variable.

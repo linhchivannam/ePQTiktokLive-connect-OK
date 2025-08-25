@@ -278,6 +278,12 @@
     <Compile Include="LIVE\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="LIVE\frm_TTLiveConnect2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LIVE\frm_TTLiveConnect2.Designer.cs">
+      <DependentUpon>frm_TTLiveConnect2.cs</DependentUpon>
+    </Compile>
     <Compile Include="LIVE\frm_TTLiveConnect.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -294,7 +300,7 @@
     <Compile Include="protobuf\Webcast.cs" />
     <Compile Include="protobuf\WebcastResponse.cs" />
     <Compile Include="protobuf\WebcastWebsocketMessage.cs" />
-    <Compile Include="protobuf\WebcastWebsocketRequest.cs" />
+    <Compile Include="protobuf\WebsocketWrapper.cs" />
     <Compile Include="protobuf\WsFrames.cs" />
     <Compile Include="TIKTOK\Constants.cs" />
     <Compile Include="TIKTOK\Tiktok.cs" />
@@ -334,6 +340,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="LIVE\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LIVE\frm_TTLiveConnect2.resx">
+      <DependentUpon>frm_TTLiveConnect2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LIVE\frm_TTLiveConnect.resx">
       <DependentUpon>frm_TTLiveConnect.cs</DependentUpon>
