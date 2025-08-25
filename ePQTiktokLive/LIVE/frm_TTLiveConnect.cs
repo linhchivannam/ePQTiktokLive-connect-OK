@@ -124,7 +124,7 @@ namespace ePQTiktokLive.LIVE
                 ["Cache-Control"] = "no-cache",
                 ["Accept-Encoding"] = "gzip, deflate, br, zstd",
                 ["Accept-Language"] = "en-US,en;q=0.9",
-                ["Sec-WebSocket-Key"]= secWebSocketKey
+                //["Sec-WebSocket-Key"]= secWebSocketKey
         };
 
             ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
@@ -132,23 +132,22 @@ namespace ePQTiktokLive.LIVE
             // 3. Theo dõi trạng thái kết nối
             ws.OnOpen += (s, e) =>
             {
-                Console.WriteLine("✅ Kết nối WebSocket đã MỞ. Bắt đầu gửi frame khởi tạo.");
+                Console.WriteLine("✅ Connected to TikTok WebSocket!");
 
-                // 1) Enter
-                ws.Send(WsFrames.BuildEnterFrame(Convert.ToInt64(roomId)));
+                ws.Send(WsFrames.BuildEnterFrame(roomId, "audience", cookie, referer, userAgent));
+                await Task.Delay(60);
+                ws.Send(WsFrames.BuildSubscribeFrame(cursor: "", roomId, cookie, referer, userAgent));
+                await Task.Delay(60);
 
-                // 2) Subscribe (nếu lúc đầu chưa có cursor thì để rỗng)
-                ws.Send(WsFrames.BuildSubscribeFrame(""));
-
-                // 3) Heartbeat mỗi 15s
-                var timer = new System.Timers.Timer(15000);
-                timer.Elapsed += (s1, e1) =>
+                // Heartbeat lặp – chuẩn là ~10s (theo tham số url)
+                _ = Task.Run(async () =>
                 {
-                    ws.Send(WsFrames.BuildHeartbeatFrame(Convert.ToInt64(roomId)));
-                };
-                timer.AutoReset = true;
-                timer.Start();
-
+                    while (ws.ReadyState == WebSocketState.Open)
+                    {
+                        ws.Send(WsFrames.BuildHeartbeatFrame(roomId, cookie, referer, userAgent));
+                        await Task.Delay(10000);
+                    }
+                });
 
 
                 //SendEnterFrame(roomId, ws);
